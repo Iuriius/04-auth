@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
+const { handleMongooseError } = require("../helpers");
 
 const contactSchema = new Schema(
 	{
@@ -20,14 +21,15 @@ const contactSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		owner: {
+			type: Schema.Types.ObjectId,
+			ref: "user",
+		},
 	},
 	{ versionKey: false, timestamps: true },
 );
 
-contactSchema.post("save", (error, data, next) => {
-	error.status = 400;
-	next();
-});
+contactSchema.post("save", handleMongooseError);
 
 const addSchema = Joi.object({
 	name: Joi.string().required().messages({
@@ -51,6 +53,13 @@ const addSchema = Joi.object({
 	}),
 });
 
+const updateSchema = Joi.object({
+	name: Joi.string().optional(),
+	email: Joi.string().optional(),
+	phone: Joi.string().optional(),
+	favorite: Joi.boolean().optional(),
+});
+
 const updateFavoriteSchema = Joi.object({
 	favorite: Joi.boolean().required().messages({
 		"any.required": `missing field "favorite"`,
@@ -61,6 +70,7 @@ const updateFavoriteSchema = Joi.object({
 
 const schemas = {
 	addSchema,
+	updateSchema,
 	updateFavoriteSchema,
 };
 

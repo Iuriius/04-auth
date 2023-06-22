@@ -1,36 +1,45 @@
-const { ctrlWrapper } = require("../utils/index.js");
-const { HttpError } = require("http-errors");
-
+const { HttpError, ctrlWrapper } = require("../helpers");
 const { Contact } = require("../models/contact.js");
 
 const getAllContacts = async (req, res) => {
-	const result = await Contact.find({}, "-createdAt -updatedAt");
+	const { id: owner } = req.user;
+	const result = await Contact.find({ owner }, "-createdAt -updatedAt");
 	res.json(result);
 };
 
 const getById = async (req, res) => {
 	const { contactId } = req.params;
+	const { id } = req.user;
 	const result = await Contact.findById(contactId);
+	const contactOwnerId = result.owner.toString();
 
 	if (!result) {
 		throw HttpError(404, `Not found contact with ${contactId}`);
+	}
+	if (id !== contactOwnerId) {
+		return res.status(403).json({ message: "Forbidden" });
 	}
 
 	return res.json(result);
 };
 
 const addMyContact = async (req, res) => {
-	const result = await Contact.create(req.body);
+	const owner = req.user.id;
+	const result = await Contact.create({ ...req.body, owner });
 	res.status(201).json(result);
 };
 
 const deleteContact = async (req, res) => {
 	const { contactId } = req.params;
+	const { id } = req.user;
 	const result = await Contact.findByIdAndDelete(contactId);
+	const contactOwnerId = result.owner.toString();
 	if (!result) {
 		throw HttpError(404, `contact with ${contactId} not found`);
 	}
-
+	if (id !== contactOwnerId) {
+		return res.status(403).json({ message: "Forbidden" });
+	}
 	res.json({
 		message: "Contact deleted",
 	});
