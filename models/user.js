@@ -38,14 +38,14 @@ const loginSchema = Joi.object({
 	email: Joi.string().required().error(new Error("missing required email field")),
 	password: Joi.string().required().error(new Error("missing required password field")),
 });
-const updateSubscriptionSchema = Joi.object({
+const updateSchema = Joi.object({
 	subscription: Joi.string().required().error(new Error("missing required subscription field")),
 });
 
 const schemas = {
 	registerSchema,
 	loginSchema,
-	updateSubscriptionSchema,
+	updateSchema,
 };
 
 module.exports = {

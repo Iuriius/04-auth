@@ -54,10 +54,18 @@ const current = async (req, res) => {
 		subscription: user.subscription,
 	});
 };
+const update = async (req, res) => {
+	const { _id } = req.user;
+	const result = await User.findByIdAndUpdate(_id, req.body, {
+		new: true,
+	}).select("subscription");
+	res.json(result);
+};
 
 module.exports = {
 	register: ctrlWrapper(register),
 	login: ctrlWrapper(login),
 	logout: ctrlWrapper(logout),
 	current: ctrlWrapper(current),
+	update: ctrlWrapper(update),
 };

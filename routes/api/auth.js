@@ -7,14 +7,8 @@ const ctrl = require("../../controllers/auth");
 
 router.post("/register", validateBody(schemas.registerSchema), ctrl.register);
 router.post("/login", validateBody(schemas.loginSchema), ctrl.login);
-router.get("/current", authenticate, ctrl.getCurrent);
+router.get("/current", authenticate, ctrl.current);
 router.post("/logout", authenticate, ctrl.logout);
-router.patch(
-	"/",
-	authenticate,
-	validateBody(schemas.updateSubscriptionSchema),
-	checkSubscription,
-	ctrl.updateSubscription,
-);
+router.patch("/", authenticate, validateBody(schemas.updateSchema), checkSubscription, ctrl.update);
 
 module.exports = router;
